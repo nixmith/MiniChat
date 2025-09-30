@@ -95,7 +95,7 @@ public class ClientHandler extends Thread {
             // Check for special commands
             if (line.equals("Bye")) {
                 String timestamp = LocalDateTime.now().format(TIME_FORMAT);
-                System.out.println(timestamp + " " + username + " disconnected with a Bye message.");
+                System.out.println(timestamp + " " + username + " left the server.");
                 // This will handle the goodbye broadcast
                 break; // Trigger cleanup
             } else if (line.equals("AllUsers")) {
