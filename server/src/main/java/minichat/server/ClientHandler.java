@@ -24,16 +24,16 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            // Setup I/O streams with UTF-8 encoding
+            // Setup I/O streams w UTF-8 encoding
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 
-            // Phase 1: Registration
+            // Registration
             if (!handleRegistration()) {
                 return;
             }
 
-            // Phase 2: Chat loop
+            // Chat loop
             handleChatLoop();
 
         } catch (IOException e) {
@@ -62,7 +62,7 @@ public class ClientHandler extends Thread {
                     continue;
                 }
 
-                // Try to register the username
+                // Try to register username
                 if (registry.add(proposedName, out, Instant.now())) {
                     this.username = proposedName;
 
@@ -70,7 +70,7 @@ public class ClientHandler extends Thread {
                     String timestamp = LocalDateTime.now().format(TIME_FORMAT);
                     System.out.println(timestamp + " Welcome " + username);
 
-                    // Broadcast welcome message without comma or exclamation (fix discrepancy)
+                    // Broadcast welcome message 
                     registry.broadcastServer("Welcome " + username);
                     return true;
                 } else {
@@ -92,26 +92,26 @@ public class ClientHandler extends Thread {
                 continue;
             }
 
-            // Check for special commands FIRST
+            // Check for special commands
             if (line.equals("Bye")) {
                 String timestamp = LocalDateTime.now().format(TIME_FORMAT);
                 System.out.println(timestamp + " " + username + " disconnected with a Bye message.");
-                // The cleanup() method will handle the goodbye broadcast
-                break; // Will trigger cleanup
+                // This will handle the goodbye broadcast
+                break; // Trigger cleanup
             } else if (line.equals("AllUsers")) {
-                // Send user list ONLY to the requesting client
+                // Send user list to the requesting client
                 registry.sendUserList(username, out);
             } else {
-                // Check if message incorrectly starts with "username = "
-                // This handles the bug where client might still send it
+                // Check if message wromgl starts with "username = "
+                // Handles bug where client might still send it
                 Matcher matcher = USERNAME_PATTERN.matcher(line);
                 if (matcher.matches()) {
-                    // Extract the actual message part
+                    // Extract the actual message
                     String actualMessage = matcher.group(1).trim();
-                    // Print to server console
+                    // Print to server
                     String timestamp = LocalDateTime.now().format(TIME_FORMAT);
                     System.out.println(timestamp + " " + username + ": " + actualMessage);
-                    // Broadcast the actual message without the "username = " prefix
+                    // Broadcast actual message without the prefix
                     registry.broadcastFrom(username, actualMessage);
                 } else {
                     // Print to server console
@@ -131,7 +131,7 @@ public class ClientHandler extends Thread {
                 // Broadcast goodbye message
                 registry.broadcastServer("Goodbye " + username);
 
-                // Print to server console
+                // Print to server
                 String timestamp = LocalDateTime.now().format(TIME_FORMAT);
                 System.out.println(timestamp + " Server: Goodbye " + username);
             }
