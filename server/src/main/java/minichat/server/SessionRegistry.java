@@ -18,7 +18,7 @@ public class SessionRegistry {
         this.sessions = new ConcurrentHashMap<>();
     }
 
-    // Inner class to hold client session data
+    // Inner class holds client session data
     private static class ClientSession {
         final PrintWriter writer;
         final Instant joinedAt;
@@ -29,7 +29,7 @@ public class SessionRegistry {
         }
     }
 
-    // Add a new user to the registry
+    // Add new user to registry
     public synchronized boolean add(String username, PrintWriter writer, Instant joinedAt) {
         if (sessions.containsKey(username)) {
             return false; // Username already taken
@@ -38,28 +38,28 @@ public class SessionRegistry {
         return true;
     }
 
-    // Remove a user from the registry
+    // Remove user from registry
     public void remove(String username) {
         sessions.remove(username);
     }
 
-    // Broadcast a server message to all users
+    // Broadcast server message to all users
     public void broadcastServer(String text) {
         String timestamp = LocalDateTime.now().format(TIME_FORMAT);
         broadcast(timestamp + " Server: " + text);
     }
 
-    // Broadcast a message from a specific user
+    // Broadcast a message from specific user
     public void broadcastFrom(String username, String text) {
         String timestamp = LocalDateTime.now().format(TIME_FORMAT);
         broadcast(timestamp + " " + username + ": " + text);
     }
 
-    // Internal broadcast method
+    // Internal broadcast
     private void broadcast(String message) {
         List<String> failedUsers = new ArrayList<>();
 
-        // Create a snapshot to avoid concurrent modification
+        // Create snapshot to avoid concurrently modifying
         Map<String, ClientSession> snapshot = new HashMap<>(sessions);
 
         for (Map.Entry<String, ClientSession> entry : snapshot.entrySet()) {
@@ -67,7 +67,7 @@ public class SessionRegistry {
                 entry.getValue().writer.println(message);
                 entry.getValue().writer.flush();
 
-                // Check if the write actually failed (connection closed)
+                // Check if write actually failed (connection closed)
                 if (entry.getValue().writer.checkError()) {
                     failedUsers.add(entry.getKey());
                 }
@@ -83,7 +83,7 @@ public class SessionRegistry {
         }
     }
 
-    // Send list of active users to a specific user
+    // Send list of active users to specific user
     public void sendUserList(String requester, PrintWriter writer) {
         StringBuilder sb = new StringBuilder();
 
@@ -110,7 +110,7 @@ public class SessionRegistry {
         }
         sb.append("\n");
 
-        // Send only to the requester
+        // Send only to requester
         try {
             writer.print(sb.toString());
             writer.flush();
@@ -125,18 +125,18 @@ public class SessionRegistry {
             try {
                 entry.getValue().writer.close();
             } catch (Exception e) {
-                // Ignore errors during shutdown
+                // Ignore
             }
         }
         sessions.clear();
     }
 
-    // Get count of active users (for testing)
+    // Get count of active users
     public int getUserCount() {
         return sessions.size();
     }
 
-    // Check if user exists (for testing)
+    // Check if user exists
     public boolean hasUser(String username) {
         return sessions.containsKey(username);
     }
