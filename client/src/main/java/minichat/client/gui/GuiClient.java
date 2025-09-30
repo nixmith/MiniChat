@@ -1,12 +1,5 @@
 package minichat.client.gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -15,6 +8,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.text.*;
 
 /**
  * AOL 1990s-style GUI Chat Client
@@ -797,6 +797,9 @@ public class GuiClient extends JFrame {
                         if (!peopleModel.contains("• " + newUser)) {
                             peopleModel.addElement("• " + newUser);
                             refreshPeopleList();
+                        }
+			            if (newUser.equals(username)) {
+			                requestUserList();
                         }
                     }
                     // Goodbye message - remove user from list
