@@ -1,23 +1,23 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo ===================================
-echo MiniChat Build Script
-echo ===================================
+echo ========================================================
+echo MiniChat Installation Wizard
+echo ========================================================
 
-rem Clean and create directories
+rem Clean/create directories
 echo Cleaning previous build...
 if exist out rmdir /s /q out
 if exist jar rmdir /s /q jar
 mkdir out
 mkdir jar
 
-rem Find all Java source files
+rem Find source files
 echo Collecting source files...
 dir /s /b server\src\main\java\*.java > sources.txt
 dir /s /b client\src\main\java\*.java >> sources.txt
 
-rem Count source files (Windows method)
+rem Count source files
 for /f %%a in ('type sources.txt ^| find /c /v ""') do set FILE_COUNT=%%a
 echo Found %FILE_COUNT% source files
 
@@ -30,7 +30,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo Compilation successful!
+echo Compile successful.
 
 rem Create server JAR
 echo Creating server.jar...
@@ -44,20 +44,19 @@ rem Create client GUI JAR
 echo Creating client-gui.jar...
 jar --create --file jar\client-gui.jar --main-class=minichat.client.gui.GuiClient -C out .
 
-rem Clean up
 del sources.txt
 
 echo.
-echo ===================================
-echo Build Complete!
-echo ===================================
+echo ========================================================
+echo Build Complete! Thanks for choosing MiniChat.
+echo ========================================================
 echo Generated files:
-echo   - jar\server.jar
-echo   - jar\client.jar
-echo   - jar\client-gui.jar
+echo   jar\server.jar
+echo   jar\client.jar
+echo   jar\client-gui.jar
 echo.
 echo To run:
 echo   Server: java -jar jar\server.jar ^<port^>
 echo   Client: java -jar jar\client.jar ^<host^> ^<port^>
-echo   GUI:    java -jar jar\client-gui.jar
-echo ===================================
+echo   GUI:    java -jar jar\client-gui.jar ^<host^> ^<port^>
+echo ========================================================
