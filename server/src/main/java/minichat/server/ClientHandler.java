@@ -3,6 +3,8 @@ package minichat.server;
 import java.io.*;
 import java.net.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.*;
 
 public class ClientHandler extends Thread {
@@ -12,6 +14,7 @@ public class ClientHandler extends Thread {
     private final SessionRegistry registry;
     private String username;
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^username\\s*=\\s*(\\S.*)$");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public ClientHandler(Socket socket, SessionRegistry registry) {
         this.socket = socket;
@@ -41,7 +44,7 @@ public class ClientHandler extends Thread {
     }
 
     private boolean handleRegistration() throws IOException {
-        out.println("Please set your username: username = <Name>");
+        out.println("Please set your username: username = <name>");
 
         String line;
         while ((line = in.readLine()) != null) {
@@ -55,23 +58,26 @@ public class ClientHandler extends Thread {
                 String proposedName = matcher.group(1).trim();
 
                 if (proposedName.isEmpty()) {
-                    out.println("Username cannot be empty. Please try again: username = <Name>");
+                    out.println("Username cannot be empty. Please try again: username = <name>");
                     continue;
                 }
 
                 // Try to register the username
                 if (registry.add(proposedName, out, Instant.now())) {
                     this.username = proposedName;
-                    System.out.println("User registered: " + username);
 
-                    // Broadcast welcome message
-                    registry.broadcastServer("Welcome, " + username + "!");
+                    // Print to server console with timestamp
+                    String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+                    System.out.println(timestamp + " Welcome " + username);
+
+                    // Broadcast welcome message without comma or exclamation (fix discrepancy)
+                    registry.broadcastServer("Welcome " + username);
                     return true;
                 } else {
-                    out.println("Username already taken. Please choose another: username = <Name>");
+                    out.println("Username already taken. Please choose another: username = <name>");
                 }
             } else {
-                out.println("Please set your username: username = <Name>");
+                out.println("Please set your username: username = <name>");
             }
         }
 
@@ -88,7 +94,8 @@ public class ClientHandler extends Thread {
 
             // Check for special commands FIRST
             if (line.equals("Bye")) {
-                System.out.println("User " + username + " is leaving");
+                String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+                System.out.println(timestamp + " " + username + " disconnected with a Bye message.");
                 // The cleanup() method will handle the goodbye broadcast
                 break; // Will trigger cleanup
             } else if (line.equals("AllUsers")) {
@@ -101,9 +108,15 @@ public class ClientHandler extends Thread {
                 if (matcher.matches()) {
                     // Extract the actual message part
                     String actualMessage = matcher.group(1).trim();
+                    // Print to server console
+                    String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+                    System.out.println(timestamp + " " + username + ": " + actualMessage);
                     // Broadcast the actual message without the "username = " prefix
                     registry.broadcastFrom(username, actualMessage);
                 } else {
+                    // Print to server console
+                    String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+                    System.out.println(timestamp + " " + username + ": " + line);
                     // Broadcast regular message as-is
                     registry.broadcastFrom(username, line);
                 }
@@ -117,7 +130,10 @@ public class ClientHandler extends Thread {
                 registry.remove(username);
                 // Broadcast goodbye message
                 registry.broadcastServer("Goodbye " + username);
-                System.out.println("User disconnected: " + username);
+
+                // Print to server console
+                String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+                System.out.println(timestamp + " Server: Goodbye " + username);
             }
 
             if (socket != null && !socket.isClosed()) {

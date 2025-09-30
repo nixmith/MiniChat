@@ -24,7 +24,9 @@ public class Client {
         out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
         consoleReader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
-        System.out.println("Connected to server at " + host + ":" + port);
+        // Display connection confirmation (matching expected output)
+        System.out.println("Connection accepted " + socket.getInetAddress().getHostName() + "/" +
+                socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + "\n");
     }
 
     public void start() {
@@ -55,12 +57,12 @@ public class Client {
         try {
             // Read initial server prompt
             String prompt = in.readLine();
-            if (prompt != null) {
-                System.out.println(prompt);
+            if (prompt != null && prompt.contains("Please set your username")) {
+                // Don't display the server's technical prompt, just ask for username
+                System.out.println("Enter the username:");
             }
 
             // Get username from user
-            System.out.println("Enter your username:");
             String username = consoleReader.readLine();
 
             // Send registration message
@@ -82,13 +84,19 @@ public class Client {
         try {
             String line;
             while (running.get() && (line = in.readLine()) != null) {
-                System.out.println(line);
-
-                // Check if server is asking for username again (registration failed)
-                if (line.contains("Username already taken") ||
-                        line.contains("Username cannot be empty")) {
-                    isRegistered = false;  // Reset registration status
-                    System.out.println("Enter your username:");
+                // Filter out the technical prompts from server
+                if (line.contains("Please set your username") ||
+                        line.contains("Please choose another")) {
+                    // Handle registration errors
+                    if (line.contains("Username already taken") ||
+                            line.contains("Username cannot be empty")) {
+                        isRegistered = false;  // Reset registration status
+                        System.out.println(line);
+                        System.out.println("Enter the username:");
+                    }
+                } else {
+                    // Display all other messages (chat messages, welcome, goodbye, user lists)
+                    System.out.println(line);
                 }
             }
         } catch (IOException e) {
@@ -136,7 +144,6 @@ public class Client {
         } catch (IOException e) {
             // Ignore errors during shutdown
         }
-        System.out.println("Disconnected from server");
     }
 
     public static void main(String[] args) {

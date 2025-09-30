@@ -24,12 +24,15 @@ public class Server {
 
     public void start() {
         System.out.println("Server started on port " + serverSocket.getLocalPort());
+        System.out.println("------------------------------------------------------------------------");
 
         acceptThread = Thread.currentThread();
         while (running.get()) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("New connection from: " + clientSocket.getInetAddress());
+
+                // Don't display "New connection from" message to match expected output
+                // The welcome message will be displayed by ClientHandler
 
                 // Start a new thread for each client
                 ClientHandler handler = new ClientHandler(clientSocket, registry);

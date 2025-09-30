@@ -1,0 +1,234 @@
+# .gitignore for MiniChat Project
+# This keeps only files needed for submission
+
+# ====================================
+# Compiled Output (except JARs)
+# ====================================
+# Class files
+*.class
+
+# Build directories
+out/
+bin/
+build/
+target/
+classes/
+
+# Keep JAR files for submission
+# (normally these would be ignored, but they're deliverables)
+!jar/*.jar
+
+# ====================================
+# IDE and Editor Files
+# ====================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+.recommenders/
+.externalToolBuilders/
+*.launch
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+nb-configuration.xml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.swp
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ====================================
+# Operating System Files
+# ====================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+
+# ====================================
+# Testing and Debugging
+# ====================================
+# Test output
+test-output/
+test-results/
+*.log
+logs/
+
+# JUnit
+junit*.properties
+
+# Coverage reports
+*.lcov
+coverage/
+.nyc_output/
+
+# ====================================
+# Documentation Build Files
+# ====================================
+# Keep markdown files
+!*.md
+
+# Ignore temporary PDF conversion files
+temp_report.html
+*.aux
+*.out
+*.toc
+*.synctex.gz
+
+# Keep the final PDF report if it exists
+!PA1_Report.pdf
+!report.pdf
+!Report.pdf
+
+# ====================================
+# Temporary and Backup Files
+# ====================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+
+# ====================================
+# Package Files (except project JARs)
+# ====================================
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# But keep our project JARs
+!jar/server.jar
+!jar/client.jar
+!jar/client-gui.jar
+
+# ====================================
+# Build Tool Files
+# ====================================
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Ant
+build.xml
+
+# ====================================
+# Personal Files
+# ====================================
+# Personal notes or drafts
+notes.txt
+notes.md
+draft*
+personal*
+TODO.txt
+todo.txt
+
+# ====================================
+# Compilation Artifacts
+# ====================================
+# Temporary source list file
+sources.txt
+
+# ====================================
+# Keep These Files for Submission
+# ====================================
+# Source code
+!server/src/main/java/**/*.java
+!client/src/main/java/**/*.java
+!server/src/test/java/**/*.java
+!client/src/test/java/**/*.java
+
+# Scripts
+!scripts/*.sh
+!scripts/*.bat
+!*.sh
+!*.bat
+
+# Documentation
+!README.md
+!REPORT.md
+!CHANGES_SUMMARY.md
+!PA1.pdf
+!PA 1.pdf
+
+# Project structure files that might be needed
+!.gitignore
+
+# JAR files (deliverables)
+!jar/
+!jar/*.jar
+
+# ====================================
+# Special Files to Ignore
+# ====================================
+# The ChessBot files that seem unrelated
+ChessBot*/
+doc/
+*.html
+!doc/help-doc.html  # In case this is needed
+
+# Random XML files if not needed
+*.xml
+
+# But keep module definitions if they're part of the project
+!.idea/modules.xml
+!.idea/misc.xml
+!.idea/vcs.xml

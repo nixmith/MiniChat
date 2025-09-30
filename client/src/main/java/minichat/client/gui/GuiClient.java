@@ -5,8 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class GuiClient extends JFrame {
     private Socket socket;
@@ -26,8 +24,6 @@ public class GuiClient extends JFrame {
     private JTextField usernameField;
     private JLabel statusLabel;
     private JButton allUsersButton;
-
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public GuiClient() {
         super("MiniChat Client");
@@ -151,7 +147,9 @@ public class GuiClient extends JFrame {
             out.println("username = " + username);
             isRegistered = true;
 
-            appendToChat("System", "Connected to " + server + ":" + port);
+            appendToChat("System: Connected to " + server + ":" + port);
+            appendToChat("Connection accepted " + socket.getInetAddress().getHostName() + "/" +
+                    socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
 
         } catch (NumberFormatException e) {
             showError("Invalid port number");
@@ -174,7 +172,7 @@ public class GuiClient extends JFrame {
                     socket.close();
                 }
 
-                appendToChat("System", "Disconnected from server");
+                appendToChat("System: Disconnected from server");
                 updateConnectionStatus(false);
 
             } catch (IOException | InterruptedException e) {
@@ -194,15 +192,32 @@ public class GuiClient extends JFrame {
                     continue;
                 }
 
-                final String message = line;
-                SwingUtilities.invokeLater(() -> {
-                    appendToChat(message);
-                });
+                // Filter out technical prompts
+                if (line.contains("Please set your username") ||
+                        line.contains("Please choose another")) {
+                    // Handle registration errors
+                    if (line.contains("Username already taken") ||
+                            line.contains("Username cannot be empty")) {
+                        isRegistered = false;
+                        final String errorMsg = line;
+                        SwingUtilities.invokeLater(() -> {
+                            showError(errorMsg);
+                            updateConnectionStatus(false);
+                        });
+                        break;
+                    }
+                } else {
+                    // Display all other messages
+                    final String message = line;
+                    SwingUtilities.invokeLater(() -> {
+                        appendToChat(message);
+                    });
+                }
             }
         } catch (IOException e) {
             if (connected) {
                 SwingUtilities.invokeLater(() -> {
-                    appendToChat("System", "Connection lost");
+                    appendToChat("System: Connection lost");
                     updateConnectionStatus(false);
                 });
             }
@@ -232,15 +247,8 @@ public class GuiClient extends JFrame {
         }
     }
 
-    private void appendToChat(String sender, String message) {
-        String timestamp = LocalTime.now().format(TIME_FORMAT);
-        chatArea.append(String.format("[%s] %s: %s\n", timestamp, sender, message));
-        chatArea.setCaretPosition(chatArea.getDocument().getLength());
-    }
-
-    private void appendToChat(String fullMessage) {
-        String timestamp = LocalTime.now().format(TIME_FORMAT);
-        chatArea.append(String.format("[%s] %s\n", timestamp, fullMessage));
+    private void appendToChat(String message) {
+        chatArea.append(message + "\n");
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 

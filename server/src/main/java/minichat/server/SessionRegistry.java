@@ -2,11 +2,17 @@ package minichat.server;
 
 import java.io.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionRegistry {
     private final ConcurrentHashMap<String, ClientSession> sessions;
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter FULL_DATE_FORMAT = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     public SessionRegistry() {
         this.sessions = new ConcurrentHashMap<>();
@@ -39,12 +45,14 @@ public class SessionRegistry {
 
     // Broadcast a server message to all users
     public void broadcastServer(String text) {
-        broadcast("Server: " + text);
+        String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+        broadcast(timestamp + " Server: " + text);
     }
 
     // Broadcast a message from a specific user
     public void broadcastFrom(String username, String text) {
-        broadcast(username + ": " + text);
+        String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+        broadcast(timestamp + " " + username + ": " + text);
     }
 
     // Internal broadcast method
@@ -78,7 +86,10 @@ public class SessionRegistry {
     // Send list of active users to a specific user
     public void sendUserList(String requester, PrintWriter writer) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Active users:\n");
+
+        // Add header with current time
+        String timestamp = LocalDateTime.now().format(TIME_FORMAT);
+        sb.append("\nList of users connected at time: ").append(timestamp).append("\n");
 
         // Get sorted list of usernames for consistent ordering
         List<String> usernames = new ArrayList<>(sessions.keySet());
@@ -86,8 +97,18 @@ public class SessionRegistry {
 
         int index = 1;
         for (String username : usernames) {
-            sb.append("\t").append(index++).append(") ").append(username).append("\n");
+            ClientSession session = sessions.get(username);
+            if (session != null) {
+                // Convert Instant to ZonedDateTime for proper timezone formatting
+                ZonedDateTime joinedDateTime = ZonedDateTime.ofInstant(
+                        session.joinedAt, ZoneId.systemDefault());
+                String joinedFormatted = joinedDateTime.format(FULL_DATE_FORMAT);
+
+                sb.append("\t").append(index++).append(") ").append(username)
+                        .append(" since ").append(joinedFormatted).append("\n");
+            }
         }
+        sb.append("\n");
 
         // Send only to the requester
         try {
