@@ -15,7 +15,7 @@ public class Server {
         this.registry = new SessionRegistry();
         this.running = new AtomicBoolean(true);
 
-        // Add shutdown hook for graceful shutdown
+        // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\nShutting down server...");
             shutdown();
@@ -30,10 +30,6 @@ public class Server {
         while (running.get()) {
             try {
                 Socket clientSocket = serverSocket.accept();
-
-                // Don't display "New connection from" message to match expected output
-                // The welcome message will be displayed by ClientHandler
-
                 // Start a new thread for each client
                 ClientHandler handler = new ClientHandler(clientSocket, registry);
                 handler.start();
